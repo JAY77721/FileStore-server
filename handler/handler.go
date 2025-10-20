@@ -14,7 +14,7 @@ import (
 
 // 处理文件上传
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("UploadHandler called")
+	//fmt.Println("UploadHandler called")
 	switch r.Method {
 	case "GET":
 		//返回上传页面（index.html）
@@ -53,12 +53,13 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		dst.Seek(0, 0)
 		fileMeta.FileSha1 = util.FileSha1(dst)
-		meta.UpdateFileMeta(fileMeta)
+		//meta.UpdateFileMeta(fileMeta)
+		_ = meta.UpdateFileMetaDB(fileMeta)
 
 		//打印文件hash值（测试）
 		fmt.Fprintf(w, "上传成功！文件SHA1: %s", fileMeta.FileSha1)
 
-		http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
+		//http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
 	}
 
 }
@@ -72,7 +73,13 @@ func GetFileHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	filehash := r.Form.Get("filehash")
-	fMeta := meta.GetFileMeta(filehash)
+	//fMeta := meta.GetFileMeta(filehash)
+	fMeta, err := meta.GetFileMetaDB(filehash)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	data, err := json.Marshal(fMeta)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -123,7 +130,8 @@ func FileMetaUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	curFileMeta := meta.GetFileMeta(fileSha1)
 	curFileMeta.FileName = newFileName
-	meta.UpdateFileMeta(curFileMeta)
+	//meta.UpdateFileMeta(curFileMeta)
+	_ = meta.UpdateFileMetaDB(curFileMeta)
 
 	data, err := json.Marshal(curFileMeta)
 	if err != nil {
