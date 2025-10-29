@@ -32,11 +32,10 @@ func OnFileUploadFinished(filehash string, filename string, filesize int64, file
 }
 
 type TableFile struct {
-	FileSha1   string
-	FileName   sql.NullString
-	FileSize   sql.NullInt64
-	FileAddr   sql.NullString
-	FileStatus sql.NullString
+	FileSha1 string
+	FileName sql.NullString
+	FileSize sql.NullInt64
+	FileAddr sql.NullString
 }
 
 // GetFileMeta 从MySQL获取文件元信息
